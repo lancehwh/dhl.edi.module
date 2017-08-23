@@ -1,0 +1,53 @@
+  <HTML>
+    <HEAD>
+      <TITLE></TITLE>
+      <meta charset="UTF-8">
+    </HEAD>
+    <BODY>
+      <LEFT>
+
+	  <span style="font-size:12px;">
+      報單號碼: $!entryNo <br>
+      報單類別: $!entryCate <br>
+      進出口負責人員: $!ieUser <br>
+      幣別: $!currency <br>
+      離岸價格(TWD): $!fob <br>
+      錯誤訊息:<br>
+      </span>
+      
+      <TABLE>
+	      <style>
+				table, th, td{font-size:12px; }
+				table{border-collapse:collapse; margin:1em 0;border: 1px solid #CCCCCC;}
+				th, td{padding:.5em;border:1px solid #CCCCCC;text-align: left}
+				th{background:#669acc;color:#fff;text-align: center;font-weight: bold;}
+				em{color: red;}
+
+	      </style>
+          <tr>
+             <th>項次</th>
+	  	 	 <th>INV_NO</th>
+	  	 	 <th>錯誤訊息</th>
+		  </tr>
+
+		#set( $count = 1 )    
+        #foreach( $data in $dataList )
+        
+          <TR>
+            <td align="center">$!data.lineNo</td>
+	  	 	<td align="center">$!data.invNo</td>
+	  	 	<td align="center">$!data.ediMessage</td>
+          </TR>
+          
+          #set( $count = $count + 1 )
+        #end
+        
+
+
+     </TABLE>     
+          
+
+      </LEFT>
+ 
+    </BODY>
+  </HTML>

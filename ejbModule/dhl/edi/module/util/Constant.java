@@ -1,0 +1,54 @@
+package dhl.edi.module.util;
+
+public class Constant {
+	
+	public final static String PARTNER_NAME_DHL = "DHL";
+	public final static String TRANSACTION_IN = "I";
+	public final static String TRANSACTION_SET_IMPORT_RELEASE = "DHL_IMPORT_REL";
+	public final static String TRANSACTION_SET_IMPORT_SIGN = "DHL_IMPORT_SIGN";
+	public final static String TRANSACTION_SET_EXPORT = "DHL_EXPORT";
+	public final static String TRANSACTION_SET_INVPACK_ACK = "DHL_INVPACK_ACK";
+	public final static String EXPORT_FILE_TYPE = "XOCD";
+	public final static String IMPORT_FILE_TYPE = "XCCA";
+	public final static String MAIL_SUBJ_ERROR_IMPORT_RELEASE = "[ERROR][DHL][ImportRelease]";
+	public final static String MAIL_SUBJ_ERROR_IMPORT_SIGN = "[ERROR][DHL][ImportSigned]";
+	public final static String MAIL_SUBJ_ERROR_EXPORT = "[ERROR][DHL][Export]";
+	public final static String MAIL_SUBJ_ERROR_INVPACK = "[ERROR][DHL][InvPack]";
+	public final static String MAIL_SUBJ_ERROR_INVPACK_ACK = "[ERROR][DHL][InvPackAck]";
+	public final static String MAIL_SUBJ_INFO_INVPACK = "[INFO][DHL][InvPack]";
+	public final static String MAIL_SUBJ_INFO_IMPORT_RELEASE = "[INFO][DHL][ImportRelease]";
+	public final static String MAIL_SUBJ_INFO_IMPORT_SIGN = "[INFO][DHL][ImportSigned]";
+	public final static String MAIL_SUBJ_INFO_EXPORT = "[INFO][DHL][Export]";
+	public final static String MAIL_SUBJ_INFO_INVPACK_ACK = "[INFO][DHL][InvPackAck]";
+	public final static String MAIL_SUBJ_ERROR_EXPORT_INCONSISTENT_ERROR = "[DHL] 出口報單回寫資料比對錯誤";
+	public final static String MAIL_SUBJ_ERROR_EXPORT_SYSTEM_ERROR = "[ERROR][DHL][Export] System Error";
+	public final static String MAIL_SUBJ_ERROR_IMPORT_RELEASE_SYSTEM_ERROR = "[ERROR][DHL][ImportRelease] System Error";
+	public final static String MAIL_SUBJ_ERROR_IMPORT_SIGNED_SYSTEM_ERROR = "[ERROR][DHL][ImportSigned] System Error";
+	public final static String MAIL_GROUP_INVPACK = "Shuttle.InvPack";
+	public final static String MAIL_GROUP_Import_RELEASE = "Shuttle.Import.Release";
+	public final static String MAIL_GROUP_Import_SIGN = "Shuttle.Import.Signed";
+	public final static String MAIL_GROUP_Export = "Shuttle.Export";
+	public final static String MAIL_GROUP_SHUTTLE_CUSTOM = "Shuttle.Custom";
+	public final static String MAIL_GROUP_CORETRONIC_IMPORT_EXPORT = "Coretronic.ImportExport";
+	public final static String MAIL_GROUP_SHUTTLE_SYSTEM_ERROR = "Shuttle.System.Error";
+	public final static String FILE_PREFIX_INVPACK = "INVPACK";
+	public final static String FILE_EXTENSTION_XML = ".xml";
+	public final static String ABBREVIATION_CORETRONIC = "CTC";
+	public final static String ABBREVIATION_YOUNGLIGHTING = "YLT";
+	public final static String ABBREVIATION_YOUNGGREEN = "YGE";
+	public final static int OUID_CORETRONIC = 104;
+	public final static int OUID_YOUNGLIGHTING = 714;
+	public final static int OUID_YOUNGGREEN = 1955;
+	public final static String STATUS_OK = "OK";
+	public final static String STATUS_ERROR = "ERROR";
+	public final static String SP_PARAMETER_OUT_STATUS = "P_STATUS";
+	public final static String SP_PARAMETER_IN_WFID = "P_WF_ID";
+	public final static String SP_PARAMETER_OUT_ERROR_TYPE = "P_ERR_TYPE";
+	public final static String SP_PARAMETER_OUT_CUSTOM_AREA = "P_CUSTOM_AREA";
+	public final static String SP_PARAMETER_OUT_ERROR_MSG = "P_ERR_MSG";
+	public final static int ERROR_CODE_EXPORT_DATA_SYSTEM_ERROR = 3;
+	public final static int ERROR_CODE_EXPORT_DATA_INCONSISTENT = 1;
+	public final static int ERROR_CODE_EXPORT_DATA_OVERWRITED = 2;
+	public final static int CUSTOM_AREA_NORTH = 1;
+	public final static int CUSTOM_AREA_SOUTH = 2;
+}
