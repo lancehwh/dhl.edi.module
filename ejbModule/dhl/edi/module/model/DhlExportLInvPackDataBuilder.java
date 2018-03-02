@@ -1,7 +1,5 @@
 package dhl.edi.module.model;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,16 +52,24 @@ public class DhlExportLInvPackDataBuilder {
 //		return XmlDhlExportData;
 //	}
 	
-	public XmlDhlExportFormat buildXmlInvPackData(List<CtcEcShuttleInvoicePack> ctcEcDhlInvoicePacks, String ShipperCer ){
+	public XmlDhlExportFormat buildXmlInvPackData(List<CtcEcShuttleInvoicePack> ctcEcDhlInvoicePacks, String ShipperCer ) throws Exception {
 		
 		XmlDhlExportFormat XmlDhlExportData = new XmlDhlExportFormat();
+		
+
 		ArrayList<XmlDhlExportHeader> ExportHeaderList =  new ArrayList<XmlDhlExportHeader>();
+		XmlDhlExportHeader XmlDhlExportDataHeader = buildXmlHeaderInvPackData(ctcEcDhlInvoicePacks.get(0));
+		//set 統一編號
+		XmlDhlExportDataHeader.setShipperCer(ShipperCer);
+		
+		ArrayList<XmlDhlExportLine> XmlDhlExportDataLineList = new ArrayList<XmlDhlExportLine>();
+		
 		
 		for( CtcEcShuttleInvoicePack  ctcEcDhlInvoicePack : ctcEcDhlInvoicePacks )
 		{
-			XmlDhlExportHeader XmlDhlExportDataHeader = buildXmlHeaderInvPackData(ctcEcDhlInvoicePack);
-			//set 統一編號
-			XmlDhlExportDataHeader.setShipperCer(ShipperCer);
+//			XmlDhlExportHeader XmlDhlExportDataHeader = buildXmlHeaderInvPackData(ctcEcDhlInvoicePack);
+//			//set 統一編號
+//			XmlDhlExportDataHeader.setShipperCer(ShipperCer);
 			
 			XmlDhlExportLine DhlExportLinetemp = null;
 			
@@ -86,14 +92,17 @@ public class DhlExportLInvPackDataBuilder {
 			DhlExportLinetemp.setItemCCCCode(ctcEcDhlInvoicePack.getTaxRuleCode());
 			DhlExportLinetemp.setItemCurrencyCode(ctcEcDhlInvoicePack.getCurr());
 			DhlExportLinetemp.setItemForAmt(DhlExportLinetemp.getItemUnitPrice().multiply(DhlExportLinetemp.getItemQTY()));
-			XmlDhlExportDataHeader.setExportLine(DhlExportLinetemp);		
-			ExportHeaderList.add(XmlDhlExportDataHeader);
+			XmlDhlExportDataLineList.add(DhlExportLinetemp);		
+//			ExportHeaderList.add(XmlDhlExportDataHeader);
 			
 		}
 		
+		XmlDhlExportDataHeader.setExportLine(XmlDhlExportDataLineList);
+		
+		ExportHeaderList.add(XmlDhlExportDataHeader);
 		
 		XmlDhlExportData.setXmlDhlExportHeader(ExportHeaderList);
-		
+
 		return XmlDhlExportData;
 	}
 	
@@ -273,7 +282,6 @@ public class DhlExportLInvPackDataBuilder {
 					else
 					{
 						boolean isChinese;
-						int count = 0;
 //						int ByteLength = word.getBytes().length;
 				         
 				        for(int i=0; i<word.length();i++){

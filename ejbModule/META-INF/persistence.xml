@@ -5,9 +5,12 @@
 		<jta-data-source>java:/jdbc/non_xa/Coretronic_EDI_DB</jta-data-source>
 		<mapping-file>dhl/edi/module/invpack/session/CtcEcShuttleInvoicePack.xml</mapping-file>
 		<mapping-file>dhl/edi/module/exportdata/session/ExportDataSQL.xml</mapping-file>
+		<mapping-file>dhl/edi/module/importdata/session/CtcEcDhlImportH.xml</mapping-file>
 		<class>dhl.edi.module.exportdata.entity.CtcEcShuttleExportH</class>
 		<class>dhl.edi.module.exportdata.entity.CtcEcShuttleExportL</class>
 		<class>dhl.edi.module.invpack.entity.CtcEcShuttleInvoicePack</class>
+		<class>dhl.edi.module.importdata.entity.CtcEcDhlImportH</class>
+		<class>dhl.edi.module.importdata.entity.CtcEcDhlImportL</class>
 		<properties>
 		    <property name="eclipselink.target-server" value="JBoss"/>
 		    <property name="eclipselink.target-database" value="Oracle"/>

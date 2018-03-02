@@ -1,5 +1,4 @@
-package dhl.edi.module.invpack.session;
-
+package dhl.edi.module.importdata.session;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,27 +31,28 @@ import com.coretronic.util.DateUtil;
 import com.coretronic.util.FileUtil;
 import com.coretronic.util.JaxbUtil;
 
-import edi.service.MailException;
-import edi.service.MailServiceRemote;
-import edi.service.entity.MailMessage;
+import dhl.edi.module.importdata.entity.CtcEcDhlImportH;
 import dhl.edi.module.invpack.entity.CtcEcShuttleInvoicePack;
+import dhl.edi.module.invpack.session.InvoicePackingSenderBean;
 import dhl.edi.module.model.DhlExportLInvPackDataBuilder;
+import dhl.edi.module.model.DhlImportDataBuilder;
+import dhl.edi.module.model.XCCA;
 import dhl.edi.module.model.XmlDhlExportFormat;
+import dhl.edi.module.util.CommonValues;
 import dhl.edi.module.util.Constant;
 import dhl.edi.module.util.FTPConnection;
 import dhl.edi.module.util.PropertiesLoad;
-import dhl.edi.module.util.CommonValues;
+import edi.service.MailException;
+import edi.service.MailServiceRemote;
+import edi.service.entity.MailMessage;
 
-/**
- * Session Bean implementation class InvoicePackingOutSchedulerBean
- */
 @Stateless
 @LocalBean
-public class InvoicePackingSenderBean{
-
+public class DhlImportDataReqBean {
+	
 	@PersistenceContext(unitName = "ERP_DB")
 	private EntityManager em;
-	private static final Logger logger = Logger.getLogger(InvoicePackingSenderBean.class);
+	private static final Logger logger = Logger.getLogger(DhlImportDataReqBean.class);
 	private Properties properties = null; 
 	private FTPConnection ftpConnection = null;
 	InitialContext ctx;
@@ -60,17 +60,11 @@ public class InvoicePackingSenderBean{
 	private MailServiceRemote mailManager;
 	private PropertiesLoad propertiesLoad;
 	private CommonValues commonValues;
-    /**
-     * Default constructor. 
-     */
-    public InvoicePackingSenderBean() {
+	
+    public DhlImportDataReqBean() {
         // TODO Auto-generated constructor stub
     }
-
-	/**
-     * @throws Exception 
-	 * @see InvoicePackingSendor#execute()
-     */
+    
     public void execute(Workflow workflow) throws Exception {
     	
 
@@ -106,45 +100,45 @@ public class InvoicePackingSenderBean{
 		}
     }
     
+    
     private void process(Workflow workflow) throws Exception{
     	
     	//ERP team will insert shuttle_invoice_group_id into attribute10 column
-    	String invoiceGroupId = workflow.getAttribute10();
+    	String ImportHeaderId = workflow.getAttribute10();
     	
     	//ERP 統一班號放在WF attribute05
-    	String ShipperCer = workflow.getAttribute05();
+//    	String ShipperCer = workflow.getAttribute05();
     	
     	//ERP team will insert ERP OU_ID into attribute9 column
     	//104->中強光電　714->揚昇　1955->揚光綠能
-    	String custcode = null;
+//    	String custcode = null;
     	
     	String hawbNo = null;
     	
-    	File invPackFile = null;
+    	File ImportDataFile = null;
     	
-    	if(invoiceGroupId==null){
+    	if(ImportHeaderId==null){
     		
-    		logger.error("invoice_group_id in Attribute10 of workflow is null");
-    		throw new Exception("Attribute10 of workflow is null. ERP should fill in invoice_group_id in it.");
+    		logger.error("ImportHeaderId in Attribute10 of workflow is null");
+    		throw new Exception("Attribute10 of workflow is null. ERP should fill in ImportHeaderId in it.");
     	}
     	
     	
     	//query invoice packing from database by shuttle_invoice_group_id
     	logger.debug("Query Invoice Packing data: WF_ID: " + workflow.getId());
-    	List<CtcEcShuttleInvoicePack> invoicePacks = null;
-    	Query query = em.createNamedQuery("FindInvoicePack");
-    	query.setParameter("shuttleInvoicePacksGroupId", Long.parseLong(invoiceGroupId));
-    	invoicePacks = query.getResultList();
+    	List<CtcEcDhlImportH> DhlImportHeaderlist = null;
+    	Query query = em.createNamedQuery("FindImportData");
+    	query.setParameter("ImportHeaderId", Long.parseLong(ImportHeaderId));
+    	DhlImportHeaderlist = query.getResultList();
     	
-    	if( invoicePacks.size() > 0 )
+    	if( DhlImportHeaderlist.size() > 0 )
     	{
-    		hawbNo = invoicePacks.get(0).getHawb();
+    		hawbNo = DhlImportHeaderlist.get(0).getHawb();
     	}
-
     	
     	//write invoice packing.csv file
-    	String backupFolder = properties.getProperty("local.backup.path.invpack");
-    	String timePattern = DateUtil.getNowString(properties.getProperty("backup.timepattern.invpack"));
+    	String backupFolder = properties.getProperty("local.backup.path.Import");
+    	String timePattern = DateUtil.getNowString(properties.getProperty("backup.timepattern.Import"));
 	    String localBackupPath = FileUtil.concat(backupFolder, timePattern);
 	    
 	    //Create folders
@@ -153,16 +147,16 @@ public class InvoicePackingSenderBean{
 			localOutFolder.mkdirs();
 		
 		//ERP will put document number to document name column	
-	    String invPackFileName = getInvPackFileName(custcode, hawbNo);
-
-		DhlExportLInvPackDataBuilder DhlExportLInvPackDataBuilder = new DhlExportLInvPackDataBuilder();
-		XmlDhlExportFormat XmlDhlExportFormat = DhlExportLInvPackDataBuilder.buildXmlInvPackData(invoicePacks, ShipperCer);
+	    String ImportDataFileName = getImportDataFileName( hawbNo);
+//
+	    DhlImportDataBuilder DhlImportDataBuilder = new DhlImportDataBuilder();
+		XCCA XmlDhlImportFormat = DhlImportDataBuilder.buildXmlImportData(DhlImportHeaderlist.get(0));
 		
 
 		
 		try {
-		    invPackFile =  saveXMLFile( XmlDhlExportFormat,  localBackupPath,  invPackFileName);
-			logger.debug("Write Invoice Packing XML: " + invPackFile.getAbsolutePath());
+			ImportDataFile =  saveXMLFile( XmlDhlImportFormat,  localBackupPath,  ImportDataFileName);
+			logger.debug("Write Import Data XML: " + ImportDataFile.getAbsolutePath());
 	    	
 		} catch (IOException e) {
 			logger.error(e.getMessage());
@@ -177,59 +171,38 @@ public class InvoicePackingSenderBean{
 		}
     	
     	//upload XML file to ftp
-    	String remotePath = properties.getProperty("core.ftp.path.invpack");
-    	ftpConnection.uploadFile(invPackFile, remotePath, invPackFile.getName());
-    	logger.info("File is upload to FTP: " + invPackFile.getName());
+    	String remotePath = properties.getProperty("core.ftp.path.ImportData");
+    	ftpConnection.uploadFile(ImportDataFile, remotePath, ImportDataFile.getName());
+    	logger.info("File is upload to FTP: " + ImportDataFile.getName());
     	
     	//update workflow status to finished
     	//insert file name to attribute8 column
-    	updateWorkflow(workflow, WorkflowUtil.FINISH, invPackFileName);
+    	updateWorkflow(workflow, WorkflowUtil.FINISH, ImportDataFile.getName());
     	logger.info("Workflow is finished. WF_ID: " + workflow.getId());
     	
     	//mail report
     	logger.info("Mail report. WF_ID: " + workflow.getId());
-    	mailReport(workflow);
+//    	mailReport(workflow);
     }
     
-    private String getInvPackFileName(String custcode, String hawbno) throws Exception{
+    
+    private String getImportDataFileName(String hawbno) throws Exception{
     	
     	String fileName = null;
     	
-    	fileName = Constant.PARTNER_NAME_DHL + "_" + Constant.EXPORT_FILE_TYPE + "_" + hawbno + "_" + getCurrentTimeStr() + Constant.FILE_EXTENSTION_XML;
+    	fileName = Constant.PARTNER_NAME_DHL + "_" + Constant.IMPORT_FILE_TYPE + "_" + hawbno + "_" + getCurrentTimeStr() + Constant.FILE_EXTENSTION_XML;
     	
     	return fileName ;
     }
     
-    private File saveXMLFile(XmlDhlExportFormat XmlDhlExportFormat, String localBackupPath, String invPackFileName) throws IOException, JAXBException{
+    private Workflow updateWorkflow(Workflow workflow, String status, String fileName) {
     	
-    	FileOutputStream fileOutputStream = null;
-    	File file = null;
-    	String filePath = null;
-    	   	
-    	filePath = FilenameUtils.concat(localBackupPath, invPackFileName);
-    	
-    	file = new File(filePath);
-    	try {
-			fileOutputStream = FileUtils.openOutputStream(file);
-	    	JaxbUtil.marshal(XmlDhlExportFormat.class, XmlDhlExportFormat, fileOutputStream);
-	    	
-		} catch (IOException e) {
-			throw e;
-			
-		} catch (JAXBException e) {
-			throw e;
-			
-		} finally{
-			if(fileOutputStream!=null)
-				try {
-					fileOutputStream.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
+        workflow.setStatusFlag(status);
+        workflow.setAttribute08(fileName);
+        workflowService.update(workflow);
 
-    	return file;
+        return workflow;
+
     }
     
     //return current time string, format is YYYYMMDDHHMMSS
@@ -257,15 +230,40 @@ public class InvoicePackingSenderBean{
 		}
     }
     
-    private Workflow updateWorkflow(Workflow workflow, String status, String fileName) {
+    
+    private File saveXMLFile(XCCA XmlDhlImportFormat, String localBackupPath, String invPackFileName) throws IOException, JAXBException{
     	
-        workflow.setStatusFlag(status);
-        workflow.setAttribute08(fileName);
-        workflowService.update(workflow);
+    	FileOutputStream fileOutputStream = null;
+    	File file = null;
+    	String filePath = null;
+    	   	
+    	filePath = FilenameUtils.concat(localBackupPath, invPackFileName);
+    	
+    	file = new File(filePath);
+    	try {
+			fileOutputStream = FileUtils.openOutputStream(file);
+	    	JaxbUtil.marshal(XCCA.class, XmlDhlImportFormat, fileOutputStream);
+	    	
+		} catch (IOException e) {
+			throw e;
+			
+		} catch (JAXBException e) {
+			throw e;
+			
+		} finally{
+			if(fileOutputStream!=null)
+				try {
+					fileOutputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 
-        return workflow;
-
+    	return file;
     }
+    
+    
     
     private void mailError(Exception ex, long workId){
     	

@@ -3,6 +3,7 @@ package dhl.edi.module.model;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -137,7 +138,7 @@ public class XmlDhlExportHeader {
 	private String ShipperEname; // ¤½¥q§O COMPANY
 	
 	@XmlElement(name = "Item")
-	private XmlDhlExportLine ExportLine;
+	private List<XmlDhlExportLine> ExportLine;
 	
 	
 	public String getCustCode() {
@@ -307,11 +308,11 @@ public class XmlDhlExportHeader {
 		this.ShipperEname = shipperEname;
 	}
 	
-	public XmlDhlExportLine getExportLine() {
+	public List<XmlDhlExportLine> getExportLine() {
 		return ExportLine;
 	}
 
-	public void setExportLine( XmlDhlExportLine exportLine) {
+	public void setExportLine( List<XmlDhlExportLine> exportLine) {
 		this.ExportLine = exportLine;
 	}
 
